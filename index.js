@@ -1,11 +1,16 @@
 const express = require('express'); // importing express
 const app = express() // initialize express
+const axios = require('axios')
 const mongoose = require('mongoose');
+const { response } = require('express');
 const {Schema} = mongoose; //Grab the schema object from mongoose
 const port = 3000   // setting the port
 require('dotenv').config();
+var cors = require('cors');
 
 
+
+app.use(cors());
 
 app.use((req,res,next)=> {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -34,6 +39,11 @@ const User = mongoose.model('Users', new Schema({
 }));
 
 app.use(express.json());    //to use the data 
+
+
+
+
+
 // Using the get method
 app.get('/', (req,res) => {
     res.send('Hello World')
@@ -53,12 +63,14 @@ app.post('/register', (req,res)=>{
         if(err) {
             console.log(err);
             res.send(400, {
-                status:err
+                status: 'Not Valid'
             })
         } else {
             console.log('all is good');
             console.log(user);
-            res.send('registered');
+            res.send(200, {
+                status: 'registered'
+            });
         }
     })
 })
@@ -72,7 +84,9 @@ app.post('/login', (req,res)=>{
         console.log(user);
         if(user){
             res.send({
-                status: 'Valid'}) ;
+                status: 'Valid',
+                token: user.id
+            });
         } else {
             res.send(404, {
             status: "Not Found"
@@ -81,6 +95,9 @@ app.post('/login', (req,res)=>{
     })
 
 })
+
+
+
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
